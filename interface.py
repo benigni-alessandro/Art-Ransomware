@@ -9,7 +9,7 @@ from PIL import Image, ImageTk
 import re
 
 root = tk.Tk()
-root.title("Joc dels barrets")
+root.title("ArtRansomware Interfaces")
 width = root.winfo_screenwidth()
 height = root.winfo_screenheight()
 #root.geometry("%dx%d" % (width, height))
