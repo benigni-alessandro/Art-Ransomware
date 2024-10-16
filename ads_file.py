@@ -7,6 +7,7 @@ import signal
 import subprocess
 import win32file
 import win32con
+import winreg
 
 # Ctrl + C Handler
 def def_handler(sig, frame):
