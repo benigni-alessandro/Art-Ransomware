@@ -173,17 +173,3 @@ if __name__ == '__main__':
     main()
     tmp_task()
 
-
-    # Abrir la clave del registro donde se ejecutan programas al inicio
-    key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r'Software\Microsoft\Windows\CurrentVersion\Run', 0,
-                         winreg.KEY_SET_VALUE)
-
-    # Establecer el valor en la clave del registro para ejecutar el script al inicio
-    winreg.SetValueEx(key, 'NombreAmigable', 0, winreg.REG_SZ, f'{python_exe} {script_path}')
-
-    # Cerrar la clave del registro
-    winreg.CloseKey(key)
-    #subprocess.run(["python3", "interface.py"])
-
-
-
