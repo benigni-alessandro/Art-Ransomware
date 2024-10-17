@@ -3,12 +3,6 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox as MessageBox
 from PIL import Image, ImageTk
-
-
-
-
-
-
 class App(tk.Tk):
     def __init__(self, title):
         super().__init__()
