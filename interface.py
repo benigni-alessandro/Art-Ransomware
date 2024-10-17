@@ -1,18 +1,15 @@
 import tkinter as tk
 from tkinter import *
-import threading
 from tkinter import ttk
 from tkinter import messagebox as MessageBox
 from PIL import Image, ImageTk
-from cryptography.fernet import Fernet
-import sys
-import os
-from termcolor import colored
-import allfiles1
-import signal
 
 
-class Root(tk.Tk):
+
+
+
+
+class App(tk.Tk):
     def __init__(self, title):
         super().__init__()
         self.title(title)
