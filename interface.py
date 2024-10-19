@@ -51,7 +51,7 @@ class App(tk.Tk):
         image1 = Image.open("image.jpg")
         imageR = ImageTk.PhotoImage(image1)
         label1 = tk.Label(self.frame0, image=imageR, width=400, height=250)
-        label1.image = imageR  # Keep a reference to avoid garbage collection
+        label1.image = imageR
         label1.place(relx=0.5, rely=0.5, anchor="center")
 
         # Subtitle
@@ -69,10 +69,10 @@ class App(tk.Tk):
             fg="black",
             font=("Arial", 12),
             bd=2,
-            insertwidth=2,  # Grosor del cursor
-            insertbackground="black",  # Color del cursor
-            highlightthickness=2,  # Grosor del borde cuando el Entry tiene foco
-            highlightcolor="blue"  # Color del borde cuando el Entry tiene foco
+            insertwidth=2,
+            insertbackground="black",
+            highlightthickness=2,
+            highlightcolor="blue"
         )
         self.val_key_entry.place(relx=0.52, rely=1, anchor="center")
 

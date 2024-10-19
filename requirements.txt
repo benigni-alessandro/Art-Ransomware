@@ -1,8 +1,0 @@
-argparse
-allfiles1
-termcolor
-cryptography
-pyads
-pywin3
-colorama
-tqdm
